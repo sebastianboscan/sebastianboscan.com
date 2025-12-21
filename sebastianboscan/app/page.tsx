@@ -6,6 +6,7 @@ export default function App() {
       <div className="text-center">
         <h1>Hello!</h1>
         <p>This is Sebastian</p>
+        {/* <Image src="/images/headshot.jpg" width="200" height="200" alt="Headshot of Sebastian"/> */}
       </div>
     </div>
   );
