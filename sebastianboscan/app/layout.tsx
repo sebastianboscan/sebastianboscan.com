@@ -13,13 +13,20 @@ const geistMono = Geist_Mono({
 });
 
 // Processes env var. VERCEL_URL when deployed on vercel, localhost:3000 when deployed locally
-const url = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000"
+let baseURL: string
+if (process.env.NEXT_PUBLIC_SITE_URL) {
+  baseURL = process.env.NEXT_PUBLIC_SITE_URL
+} else if (process.env.VERCEL_URL) {
+  baseURL = `https://${process.env.VERCEL_URL}`
+} else {
+  baseURL = "http://localhost:3000"
+}
 
 // This is the default metadata for every webpage unless explicitly stated otherwise
 export const metadata: Metadata = {
   title: "Sebastian Boscan - Developer",
   description: "Computer Science Student working at the University of South Carolina",
-  metadataBase: new URL(url),
+  metadataBase: new URL(baseURL),
   openGraph: {
     images: ["/images/headshot.jpg"]
   }
