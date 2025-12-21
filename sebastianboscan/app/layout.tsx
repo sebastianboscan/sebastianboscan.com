@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   description: "Computer Science Student working at the University of South Carolina",
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL!),
   openGraph: {
-    images: "/images/headshot.png"
+    images: "/images/headshot.jpg"
   }
 };
 
