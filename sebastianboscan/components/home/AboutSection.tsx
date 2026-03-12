@@ -34,21 +34,19 @@ export function AboutSection() {
                 </span>
               ))}
 
-              <details className="group relative">
+              <details className="group basis-full">
                 <summary className="list-none inline-flex items-center gap-2 text-[10px] text-blue-300 font-mono uppercase tracking-widest border border-blue-500/50 px-3 py-1 bg-blue-500/10 hover:bg-blue-500/20 hover:border-blue-400 hover:text-blue-200 transition-all cursor-pointer select-none shadow-[0_0_12px_rgba(59,130,246,0.25)]">
                   <span className="group-open:hidden">More Skills</span>
                   <span className="hidden group-open:inline">Less Skills</span>
                   <span className="transition-transform duration-300 group-open:rotate-180">▾</span>
                 </summary>
 
-                <div className="absolute left-1/2 -translate-x-1/2 top-full mt-3 z-20 w-[min(40rem,calc(100vw-3rem))] overflow-hidden max-h-0 opacity-0 transition-all duration-300 ease-out group-open:max-h-[36rem] group-open:opacity-100">
-                  <div className="flex flex-wrap gap-2 border border-[#1e1e1e] bg-[#0a0a0a]/95 backdrop-blur-sm p-3">
-                    {aboutContent.additionalSkills.map((skill) => (
-                      <span key={skill} className={skillChipClassName}>
-                        {skill}
-                      </span>
-                    ))}
-                  </div>
+                <div className="mt-3 flex flex-wrap gap-2 border border-[#1e1e1e] bg-[#0a0a0a] p-3">
+                  {aboutContent.additionalSkills.map((skill) => (
+                    <span key={skill} className={skillChipClassName}>
+                      {skill}
+                    </span>
+                  ))}
                 </div>
               </details>
             </div>
