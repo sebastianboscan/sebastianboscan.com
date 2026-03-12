@@ -10,7 +10,7 @@ export function TacticalName() {
 
   useEffect(() => {
     let currentIndex = 0;
-    const typingSpeed = 80; // milliseconds per character
+    const typingSpeed = 35; // milliseconds per character
 
     const typeInterval = setInterval(() => {
       if (currentIndex <= fullName.length) {
@@ -50,14 +50,18 @@ export function TacticalName() {
           }
         `}
       </style>
-      <h1 className="text-6xl md:text-8xl mb-6 tracking-tight">
-        {displayText}
-        <span
-          className={`inline-block w-1 h-16 md:h-24 bg-blue-500 ml-1 ${
-            showCursor ? "opacity-100" : "opacity-0"
-          } transition-opacity`}
-          style={{ verticalAlign: "middle" }}
-        />
+      <h1 className="font-[var(--font-syne)] text-6xl md:text-8xl mb-6 tracking-tight relative">
+        {/* Invisible full name reserves layout space so nothing below shifts */}
+        <span className="invisible select-none">{fullName}</span>
+        <span className="absolute inset-0">
+          {displayText}
+          <span
+            className={`inline-block w-1 h-16 md:h-24 bg-blue-500 ml-1 ${
+              showCursor ? "opacity-100" : "opacity-0"
+            } transition-opacity`}
+            style={{ verticalAlign: "middle" }}
+          />
+        </span>
       </h1>
       {/* Scanning line effect */}
       <div
