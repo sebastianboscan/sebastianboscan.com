@@ -2,6 +2,7 @@ import Education from "@/components/Education";
 import Header from "@/components/Header";
 import { AboutSection } from "@/components/home/AboutSection";
 import { ContactSection } from "@/components/home/ContactSection";
+import { DisplayAppToast } from "@/components/home/DisplayAppToast";
 import { ExperienceSection } from "@/components/home/ExperienceSection";
 import { HeroSection } from "@/components/home/HeroSection";
 import { OrganizationsSection } from "@/components/home/OrganizationsSection";
@@ -22,6 +23,7 @@ export default function App() {
       <OrganizationsSection />
       <ContactSection />
       <SiteFooter />
+      <DisplayAppToast />
     </div>
   );
 }
