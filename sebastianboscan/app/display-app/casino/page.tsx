@@ -5,7 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 const FRAME_SIZE = 600;
 const STARTING_CREDITS = 1000;
 
-type GameView = "menu" | "slots" | "coinflip" | "dice" | "result";
+type GameView = "menu" | "slots" | "coinflip" | "dice" | "blackjack" | "roulette" | "result";
 
 type MenuItem = { readonly key: Exclude<GameView, "menu" | "result">; readonly label: string; readonly icon: string };
 
@@ -13,6 +13,8 @@ const MENU_ITEMS: readonly MenuItem[] = [
   { key: "slots", label: "SLOTS", icon: "🎰" },
   { key: "coinflip", label: "COIN FLIP", icon: "🪙" },
   { key: "dice", label: "DICE", icon: "🎲" },
+  { key: "blackjack", label: "BLACKJACK", icon: "🃏" },
+  { key: "roulette", label: "ROULETTE", icon: "🎡" },
 ] as const;
 
 const SLOT_SYMBOLS = ["7", "BAR", "♦", "♣", "♥", "★"] as const;
@@ -32,10 +34,11 @@ export default function CasinoApp() {
   const [lastWin, setLastWin] = useState(0);
   const [lastBet, setLastBet] = useState(0);
 
+  // payout > 0 and won=true → win; won=false and bet=0 → push (no change); won=false → loss
   const handleResult = useCallback((won: boolean, bet: number, payout: number) => {
     setLastBet(bet);
     setLastWin(won ? payout : 0);
-    setCredits((c) => c + (won ? payout : -bet));
+    if (bet > 0) setCredits((c) => c + (won ? payout : -bet));
     setView("result");
   }, []);
 
@@ -67,6 +70,12 @@ export default function CasinoApp() {
         )}
         {view === "dice" && (
           <DiceGame credits={credits} onResult={handleResult} onBack={() => setView("menu")} />
+        )}
+        {view === "blackjack" && (
+          <BlackjackGame credits={credits} onResult={handleResult} onBack={() => setView("menu")} />
+        )}
+        {view === "roulette" && (
+          <RouletteGame credits={credits} onResult={handleResult} onBack={() => setView("menu")} />
         )}
         {view === "result" && (
           <ResultView
@@ -527,6 +536,467 @@ function DiceGame({
       </div>
       <PanelFooter>
         {phase === "rolling" ? "ROLLING..." : "[↑↓] PICK · [→] BET · [⏎] ROLL · [←] BACK"}
+      </PanelFooter>
+    </>
+  );
+}
+
+// ── Blackjack ─────────────────────────────────────────────────────────────────
+
+type Suit = "♠" | "♥" | "♦" | "♣";
+type Rank = "A" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9" | "10" | "J" | "Q" | "K";
+type Card = { rank: Rank; suit: Suit };
+type BJPhase = "bet" | "play" | "dealer" | "done";
+type BJAction = "hit" | "stand";
+
+const RANKS: Rank[] = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"];
+const SUITS: Suit[] = ["♠", "♥", "♦", "♣"];
+
+function buildDeck(): Card[] {
+  const deck: Card[] = [];
+  for (const suit of SUITS) for (const rank of RANKS) deck.push({ rank, suit });
+  return deck;
+}
+
+function shuffled(deck: Card[]): Card[] {
+  const d = [...deck];
+  for (let i = d.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [d[i], d[j]] = [d[j], d[i]];
+  }
+  return d;
+}
+
+function cardValue(rank: Rank): number {
+  if (rank === "A") return 11;
+  if (["J", "Q", "K"].includes(rank)) return 10;
+  return parseInt(rank, 10);
+}
+
+function handTotal(cards: Card[]): number {
+  let total = cards.reduce((s, c) => s + cardValue(c.rank), 0);
+  let aces = cards.filter((c) => c.rank === "A").length;
+  while (total > 21 && aces > 0) { total -= 10; aces--; }
+  return total;
+}
+
+function CardPip({ card, hidden }: { readonly card: Card; readonly hidden?: boolean }) {
+  const red = card.suit === "♥" || card.suit === "♦";
+  return (
+    <div
+      className={`flex flex-col items-center justify-center border font-bold select-none ${
+        hidden
+          ? "border-yellow-500/30 bg-yellow-500/5 text-yellow-500/30"
+          : red
+          ? "border-red-500/60 bg-red-500/10 text-red-300"
+          : "border-gray-400/50 bg-white/5 text-white"
+      }`}
+      style={{ width: 52, height: 72, fontSize: 13 }}
+    >
+      {hidden ? (
+        <span className="text-[20px]">?</span>
+      ) : (
+        <>
+          <span className="text-[11px] leading-none">{card.rank}</span>
+          <span className="text-[18px] leading-none">{card.suit}</span>
+        </>
+      )}
+    </div>
+  );
+}
+
+const BJ_ACTIONS: { key: BJAction; label: string }[] = [
+  { key: "hit", label: "HIT" },
+  { key: "stand", label: "STAND" },
+];
+
+function BlackjackGame({
+  credits,
+  onResult,
+  onBack,
+}: {
+  readonly credits: number;
+  readonly onResult: (won: boolean, bet: number, payout: number) => void;
+  readonly onBack: () => void;
+}) {
+  const [bet, setBet] = useState(Math.min(100, credits));
+  const [phase, setPhase] = useState<BJPhase>("bet");
+  const [deck, setDeck] = useState<Card[]>([]);
+  const [playerHand, setPlayerHand] = useState<Card[]>([]);
+  const [dealerHand, setDealerHand] = useState<Card[]>([]);
+  const [actionIndex, setActionIndex] = useState(0);
+  const dealerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const deal = useCallback(() => {
+    if (bet > credits) return;
+    const d = shuffled(buildDeck());
+    const p = [d[0], d[2]];
+    const dealer = [d[1], d[3]];
+    setDeck(d.slice(4));
+    setPlayerHand(p);
+    setDealerHand(dealer);
+    setActionIndex(0);
+    // instant blackjack check happens in effect
+    setPhase("play");
+  }, [bet, credits]);
+
+  // check for natural blackjack right after deal
+  useEffect(() => {
+    if (phase !== "play") return;
+    const playerTotal = handTotal(playerHand);
+    const dealerTotal = handTotal(dealerHand);
+    if (playerTotal === 21 || dealerTotal === 21) {
+      setPhase("dealer");
+    }
+  }, [phase, playerHand, dealerHand]);
+
+  // dealer draws when phase === "dealer"
+  useEffect(() => {
+    if (phase !== "dealer") return;
+    const playerTotal = handTotal(playerHand);
+    if (playerTotal > 21) {
+      setPhase("done");
+      return;
+    }
+    const runDealer = (currentHand: Card[], currentDeck: Card[]) => {
+      const total = handTotal(currentHand);
+      if (total >= 17) {
+        setPhase("done");
+        return;
+      }
+      dealerRef.current = setTimeout(() => {
+        const [next, ...rest] = currentDeck;
+        const newHand = [...currentHand, next];
+        setDealerHand(newHand);
+        setDeck(rest);
+        runDealer(newHand, rest);
+      }, 500);
+    };
+    runDealer(dealerHand, deck);
+    return () => { if (dealerRef.current) clearTimeout(dealerRef.current); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase]);
+
+  // resolve result when done
+  useEffect(() => {
+    if (phase !== "done") return;
+    const p = handTotal(playerHand);
+    const d = handTotal(dealerHand);
+    const playerBust = p > 21;
+    const dealerBust = d > 21;
+    const won = !playerBust && (dealerBust || p > d);
+    const push = !playerBust && !dealerBust && p === d;
+    const blackjack = p === 21 && playerHand.length === 2;
+    const payout = push ? 0 : blackjack && won ? Math.floor(bet * 1.5) : won ? bet : 0;
+    dealerRef.current = setTimeout(() => onResult(!push && won, push ? 0 : bet, payout), 900);
+    return () => { if (dealerRef.current) clearTimeout(dealerRef.current); };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase]);
+
+  const doAction = useCallback((action: BJAction) => {
+    if (phase !== "play") return;
+    if (action === "hit") {
+      setPlayerHand((h) => {
+        const [next, ...rest] = deck;
+        setDeck(rest);
+        const newHand = [...h, next];
+        if (handTotal(newHand) >= 21) setPhase("dealer");
+        return newHand;
+      });
+    } else {
+      setPhase("dealer");
+    }
+  }, [phase, deck]);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft" && phase === "bet") { onBack(); e.preventDefault(); return; }
+      e.preventDefault();
+      if (phase === "bet") {
+        if (e.key === "ArrowUp") setBet((b) => Math.min(Math.min(500, credits), b + 50));
+        if (e.key === "ArrowDown") setBet((b) => Math.max(50, b - 50));
+        if (e.key === "Enter") deal();
+      } else if (phase === "play") {
+        if (e.key === "ArrowLeft" || e.key === "ArrowRight")
+          setActionIndex((i) => (i + 1) % BJ_ACTIONS.length);
+        if (e.key === "Enter") doAction(BJ_ACTIONS[actionIndex].key);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [phase, actionIndex, deal, doAction, onBack, credits]);
+
+  const playerTotal = playerHand.length ? handTotal(playerHand) : null;
+  const dealerTotal = dealerHand.length ? handTotal(dealerHand) : null;
+  const showDealerTotal = phase === "dealer" || phase === "done";
+
+  return (
+    <>
+      <PanelHeader label="BLACKJACK" credits={credits} />
+      <div className="flex-1 flex flex-col px-5 py-2 gap-3">
+        {/* Dealer hand */}
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] tracking-[0.3em] text-gray-500 uppercase">Dealer</span>
+            {showDealerTotal && dealerTotal !== null && (
+              <span className={`text-[13px] font-bold tracking-widest ${dealerTotal > 21 ? "text-red-400" : "text-yellow-300"}`}>
+                {dealerTotal > 21 ? "BUST" : dealerTotal}
+              </span>
+            )}
+          </div>
+          <div className="flex gap-2 flex-wrap">
+            {dealerHand.map((card, i) => (
+              <CardPip key={i} card={card} hidden={i === 1 && phase === "play"} />
+            ))}
+          </div>
+        </div>
+
+        <div className="h-px bg-yellow-500/15" />
+
+        {/* Player hand */}
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] tracking-[0.3em] text-gray-500 uppercase">You</span>
+            {playerTotal !== null && (
+              <span className={`text-[13px] font-bold tracking-widest ${playerTotal > 21 ? "text-red-400" : playerTotal === 21 ? "text-yellow-300" : "text-white"}`}>
+                {playerTotal > 21 ? "BUST" : playerTotal === 21 ? "21!" : playerTotal}
+              </span>
+            )}
+          </div>
+          <div className="flex gap-2 flex-wrap">
+            {playerHand.map((card, i) => (
+              <CardPip key={i} card={card} />
+            ))}
+          </div>
+        </div>
+
+        {/* Bet phase */}
+        {phase === "bet" && (
+          <div className="mt-auto flex flex-col gap-3">
+            <BetSelector bet={bet} min={50} max={Math.min(500, credits)} onChange={setBet} />
+            <p className="text-[11px] tracking-[0.25em] text-gray-500 uppercase text-center">
+              Blackjack pays 3:2 · Dealer stands on 17
+            </p>
+          </div>
+        )}
+
+        {/* Action buttons */}
+        {phase === "play" && (
+          <div className="mt-auto flex gap-3">
+            {BJ_ACTIONS.map((action, i) => {
+              const active = i === actionIndex;
+              return (
+                <button
+                  key={action.key}
+                  type="button"
+                  onClick={() => doAction(action.key)}
+                  onMouseEnter={() => setActionIndex(i)}
+                  className={`flex-1 flex items-center justify-center border font-bold text-[18px] tracking-widest transition-colors ${
+                    active
+                      ? "border-yellow-400 bg-yellow-400/15 text-yellow-300 shadow-[0_0_15px_rgba(234,179,8,0.3)]"
+                      : "border-yellow-500/20 text-gray-500"
+                  }`}
+                  style={{ minHeight: 88 }}
+                >
+                  {action.label}
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        {(phase === "dealer" || phase === "done") && (
+          <div className="mt-auto flex items-center justify-center" style={{ minHeight: 88 }}>
+            <p className="text-[15px] tracking-[0.3em] text-yellow-400 uppercase animate-pulse">
+              {phase === "dealer" ? "DEALER DRAWING..." : "RESOLVING..."}
+            </p>
+          </div>
+        )}
+      </div>
+      <PanelFooter>
+        {phase === "bet"
+          ? "[↑↓] BET · [⏎] DEAL · [←] BACK"
+          : phase === "play"
+          ? "[←→] ACTION · [⏎] CONFIRM"
+          : "PLEASE WAIT..."}
+      </PanelFooter>
+    </>
+  );
+}
+
+// ── Roulette ──────────────────────────────────────────────────────────────────
+
+type RouletteBetType = "red" | "black" | "green" | "odd" | "even" | "low" | "high";
+type RoulettePhase = "bet" | "spinning" | "done";
+
+const RED_NUMBERS = new Set([1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36]);
+
+const ROULETTE_BETS: { key: RouletteBetType; label: string; payout: number; color: string }[] = [
+  { key: "red",   label: "RED",   payout: 1, color: "text-red-400 border-red-500/50"     },
+  { key: "black", label: "BLACK", payout: 1, color: "text-gray-300 border-gray-500/50"   },
+  { key: "green", label: "ZERO",  payout: 35, color: "text-green-400 border-green-500/50" },
+  { key: "odd",   label: "ODD",   payout: 1, color: "text-yellow-300 border-yellow-500/40" },
+  { key: "even",  label: "EVEN",  payout: 1, color: "text-yellow-300 border-yellow-500/40" },
+  { key: "low",   label: "1-18",  payout: 1, color: "text-blue-300 border-blue-500/40"   },
+  { key: "high",  label: "19-36", payout: 1, color: "text-blue-300 border-blue-500/40"   },
+];
+
+function numberColor(n: number): "red" | "black" | "green" {
+  if (n === 0) return "green";
+  return RED_NUMBERS.has(n) ? "red" : "black";
+}
+
+function betWins(bet: RouletteBetType, result: number): boolean {
+  if (bet === "green") return result === 0;
+  if (result === 0) return false;
+  if (bet === "red") return numberColor(result) === "red";
+  if (bet === "black") return numberColor(result) === "black";
+  if (bet === "odd") return result % 2 !== 0;
+  if (bet === "even") return result % 2 === 0;
+  if (bet === "low") return result >= 1 && result <= 18;
+  if (bet === "high") return result >= 19 && result <= 36;
+  return false;
+}
+
+function RouletteGame({
+  credits,
+  onResult,
+  onBack,
+}: {
+  readonly credits: number;
+  readonly onResult: (won: boolean, bet: number, payout: number) => void;
+  readonly onBack: () => void;
+}) {
+  const [bet, setBet] = useState(Math.min(100, credits));
+  const [betIndex, setBetIndex] = useState(0);
+  const [phase, setPhase] = useState<RoulettePhase>("bet");
+  const [result, setResult] = useState<number | null>(null);
+  const [displayNum, setDisplayNum] = useState<number>(0);
+  const spinRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const spin = useCallback(() => {
+    if (phase !== "bet" || bet > credits) return;
+    setPhase("spinning");
+    let count = 0;
+    spinRef.current = setInterval(() => {
+      setDisplayNum(Math.floor(Math.random() * 37));
+      count++;
+      if (count >= 20) {
+        clearInterval(spinRef.current!);
+        const final = Math.floor(Math.random() * 37);
+        setDisplayNum(final);
+        setResult(final);
+        setPhase("done");
+        const selectedBet = ROULETTE_BETS[betIndex];
+        const won = betWins(selectedBet.key, final);
+        const payout = won ? bet * selectedBet.payout : 0;
+        setTimeout(() => onResult(won, bet, payout), 800);
+      }
+    }, 80);
+  }, [phase, bet, credits, betIndex, onResult]);
+
+  useEffect(() => {
+    return () => { if (spinRef.current) clearInterval(spinRef.current); };
+  }, []);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft" && phase === "bet") { onBack(); e.preventDefault(); return; }
+      e.preventDefault();
+      if (phase === "bet") {
+        if (e.key === "ArrowUp") setBetIndex((i) => (i - 1 + ROULETTE_BETS.length) % ROULETTE_BETS.length);
+        if (e.key === "ArrowDown") setBetIndex((i) => (i + 1) % ROULETTE_BETS.length);
+        if (e.key === "ArrowRight") setBet((b) => Math.min(Math.min(500, credits), b + 50));
+        if (e.key === "ArrowLeft") setBet((b) => Math.max(50, b - 50));
+        if (e.key === "Enter") spin();
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [phase, credits, spin, onBack]);
+
+  const col = result !== null ? numberColor(result) : null;
+  const numColorClass = col === "red" ? "text-red-400" : col === "green" ? "text-green-400" : "text-gray-200";
+
+  return (
+    <>
+      <PanelHeader label="ROULETTE" credits={credits} />
+      <div className="flex-1 flex flex-col px-5 py-2 gap-3">
+        {/* Ball display */}
+        <div className="flex items-center justify-center gap-5">
+          <div
+            className={`flex items-center justify-center border-2 font-bold transition-all ${
+              phase === "spinning"
+                ? "border-yellow-400/80 animate-spin shadow-[0_0_24px_rgba(234,179,8,0.5)]"
+                : col === "red"
+                ? "border-red-500 shadow-[0_0_20px_rgba(239,68,68,0.4)]"
+                : col === "green"
+                ? "border-green-500 shadow-[0_0_20px_rgba(34,197,94,0.4)]"
+                : "border-gray-500 shadow-[0_0_20px_rgba(156,163,175,0.3)]"
+            } rounded-full`}
+            style={{ width: 90, height: 90 }}
+          >
+            <span className={`text-[32px] font-bold ${phase === "spinning" ? "text-yellow-300" : numColorClass}`}>
+              {phase === "spinning" ? displayNum : result ?? "?"}
+            </span>
+          </div>
+          {phase === "done" && col && (
+            <div className="flex flex-col gap-1">
+              <span className={`text-[14px] font-bold tracking-widest uppercase ${numColorClass}`}>
+                {col.toUpperCase()}
+              </span>
+              {result !== null && result !== 0 && (
+                <>
+                  <span className="text-[12px] tracking-widest text-gray-500 uppercase">
+                    {result % 2 === 0 ? "EVEN" : "ODD"}
+                  </span>
+                  <span className="text-[12px] tracking-widest text-gray-500 uppercase">
+                    {result <= 18 ? "LOW" : "HIGH"}
+                  </span>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Bet type picker */}
+        <div className="flex flex-col gap-1.5">
+          <span className="text-[11px] tracking-[0.3em] text-gray-500 uppercase">Your bet</span>
+          <div className="grid grid-cols-2 gap-2">
+            {ROULETTE_BETS.map((b, i) => {
+              const active = i === betIndex;
+              return (
+                <button
+                  key={b.key}
+                  type="button"
+                  disabled={phase !== "bet"}
+                  onMouseEnter={() => setBetIndex(i)}
+                  onClick={() => { if (phase === "bet") setBetIndex(i); }}
+                  className={`flex items-center justify-between px-3 border text-[14px] font-bold tracking-widest transition-colors disabled:opacity-50 ${
+                    active
+                      ? `${b.color} bg-white/5 shadow-[0_0_10px_rgba(255,255,255,0.1)]`
+                      : "border-white/10 text-gray-600"
+                  }`}
+                  style={{ minHeight: 44 }}
+                >
+                  <span>{b.label}</span>
+                  <span className="text-[11px] text-gray-500">{b.payout}×</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="mt-auto">
+          <BetSelector bet={bet} min={50} max={Math.min(500, credits)} onChange={setBet} />
+        </div>
+      </div>
+      <PanelFooter>
+        {phase === "spinning"
+          ? "SPINNING..."
+          : phase === "done"
+          ? "RESOLVING..."
+          : "[↑↓] BET TYPE · [←→] AMOUNT · [⏎] SPIN · [←] BACK"}
       </PanelFooter>
     </>
   );
