@@ -5,9 +5,8 @@ import { useEffect, useRef } from "react";
 const CELL = 48;
 // How far from the cursor the warp still has any effect.
 const RADIUS = 260;
-// Peak pixel displacement at the cursor itself. Near a full cell, so the
-// warp reads as a bulge rather than a subtle bend.
-const STRENGTH = 40;
+// Peak pixel displacement at the cursor itself.
+const STRENGTH = 26;
 // Fraction of the remaining distance the warp closes each frame.
 const EASE = 0.12;
 
@@ -58,7 +57,7 @@ export function PageBackground() {
 
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, w, h);
-      ctx.strokeStyle = "rgba(59, 130, 246, 0.14)";
+      ctx.strokeStyle = "rgba(59, 130, 246, 0.05)";
       ctx.lineWidth = 1;
 
       // One extra cell past each edge so warped lines never pull away from the border.
