@@ -9,7 +9,7 @@ export default function Education() {
         <header className="mb-18 animate-fade-up">
           <SectionLabel />
           <h1 className="font-[var(--font-syne),sans-serif] leading-none tracking-tight text-7xl text-[#f0f0f0]">
-            Edu<span className="text-blue-500">cation</span>
+            Education
           </h1>
         </header>
 

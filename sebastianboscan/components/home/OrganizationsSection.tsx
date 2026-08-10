@@ -42,7 +42,7 @@ export function OrganizationsSection() {
     <section id="organizations" className="py-24 px-6 border-t border-[#1e1e1e] relative z-10 scroll-mt-20">
       <div className="max-w-5xl mx-auto">
         <SectionLabel />
-        <SectionHeading prefix="Organi" accent="zations" />
+        <SectionHeading title="Organizations" />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {organizationEntries.map((organization) => (

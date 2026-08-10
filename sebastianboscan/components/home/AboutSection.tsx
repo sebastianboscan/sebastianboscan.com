@@ -11,7 +11,7 @@ export function AboutSection() {
     <section id="about" className="py-24 px-6 border-t border-[#1e1e1e] relative z-10 scroll-mt-20">
       <div className="max-w-5xl mx-auto">
         <SectionLabel />
-        <SectionHeading prefix="About" accent=" Me" />
+        <SectionHeading title="About Me" />
 
         <div className="flex flex-col md:flex-row gap-12 items-start">
           <div className="relative w-48 md:w-56 flex-shrink-0 border border-blue-500/30 overflow-hidden">

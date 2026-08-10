@@ -69,7 +69,7 @@ export function ExperienceSection() {
     <section id="experience" className="py-24 px-6 border-t border-[#1e1e1e] relative z-10 scroll-mt-20">
       <div className="max-w-5xl mx-auto">
         <SectionLabel />
-        <SectionHeading prefix="Experi" accent="ence" />
+        <SectionHeading title="Experience" />
 
         <div className="space-y-4">
           {experienceEntries.map((entry) => (

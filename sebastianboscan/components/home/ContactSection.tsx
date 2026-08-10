@@ -8,7 +8,7 @@ export function ContactSection() {
     <section id="contact" className="py-24 px-6 border-t border-[#1e1e1e] relative z-10 scroll-mt-20">
       <div className="max-w-5xl mx-auto">
         <SectionLabel />
-        <SectionHeading prefix="Con" accent="tact" />
+        <SectionHeading title="Contact" />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {contactLinks.map((link) => (

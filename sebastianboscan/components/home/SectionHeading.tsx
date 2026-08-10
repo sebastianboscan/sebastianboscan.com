@@ -1,13 +1,11 @@
 type SectionHeadingProps = {
-  readonly prefix: string;
-  readonly accent: string;
+  readonly title: string;
 };
 
-export function SectionHeading({ prefix, accent }: SectionHeadingProps) {
+export function SectionHeading({ title }: SectionHeadingProps) {
   return (
     <h2 className="font-[var(--font-syne),sans-serif] text-5xl text-[#f0f0f0] tracking-tight mb-12">
-      {prefix}
-      <span className="text-blue-500">{accent}</span>
+      {title}
     </h2>
   );
 }
