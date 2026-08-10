@@ -46,7 +46,7 @@ export function ProjectsSection() {
     <section id="projects" className="py-24 px-6 border-t border-[#1e1e1e] relative z-10 scroll-mt-20">
       <div className="max-w-5xl mx-auto">
         <SectionLabel />
-        <SectionHeading prefix="Pro" accent="jects" />
+        <SectionHeading title="Projects" />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {projectEntries.map((project) => (
