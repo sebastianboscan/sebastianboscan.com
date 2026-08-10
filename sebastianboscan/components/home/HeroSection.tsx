@@ -1,4 +1,5 @@
 import { TacticalName } from "@/components/TacticalName";
+import { HeroRoleCycle } from "@/components/home/HeroRoleCycle";
 import { HeroTelemetry } from "@/components/home/HeroTelemetry";
 import { heroLinks } from "@/components/home/content";
 
@@ -17,7 +18,7 @@ export function HeroSection() {
         <TacticalName />
 
         <div className="w-24 h-px bg-gradient-to-r from-transparent via-blue-500 to-transparent mx-auto mb-6" />
-        <p className="text-xl text-gray-300 mb-12">Computer Science Student</p>
+        <HeroRoleCycle />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {heroLinks.map((link, index) => (

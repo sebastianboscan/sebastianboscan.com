@@ -103,9 +103,22 @@ export const aboutContent: AboutContent = {
   ],
 } as const;
 
+export type HeroRole = {
+  readonly title: string;
+  readonly org: string;
+};
+
+/** Cycled one at a time under the hero name. */
+export const heroRoles: readonly HeroRole[] = [
+  { title: "Computer Science Student", org: "University of South Carolina" },
+  { title: "Applications Engineer", org: "Center for Industry Solutions" },
+  { title: "Undergraduate Research Assistant", org: "HI3 Tech Lab" },
+  { title: "Product Manager", org: "Kappa Theta Pi" },
+] as const;
+
 export const experienceEntries: readonly ExperienceEntry[] = [
   {
-    role: "Computer Science Intern - Robotics & VR",
+    role: "Applications Engineer - Robotics & VR",
     company: "Center for Industry Solutions (C4iS)",
     date: "July 2025 - Present",
     location: "Columbia, SC",
