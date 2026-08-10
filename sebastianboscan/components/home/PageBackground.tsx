@@ -57,7 +57,7 @@ export function PageBackground() {
 
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, w, h);
-      ctx.strokeStyle = "rgba(59, 130, 246, 0.05)";
+      ctx.strokeStyle = "rgba(59, 130, 246, 0.08)";
       ctx.lineWidth = 1;
 
       // One extra cell past each edge so warped lines never pull away from the border.
