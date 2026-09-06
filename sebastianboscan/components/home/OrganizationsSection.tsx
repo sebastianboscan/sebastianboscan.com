@@ -7,11 +7,11 @@ function OrganizationCard({ organization }: { readonly organization: Organizatio
   return (
     <TacticalCard
       className="p-6"
-      accent={organization.statusLabel ? "yellow" : "blue"}
+      accent={organization.statusLabel ? "yellow" : "default"}
     >
       <div className="flex justify-between items-start flex-wrap gap-2 mb-2">
         <h3 className="text-[#f0f0f0] font-bold">{organization.name}</h3>
-        <span className="text-[11px] text-blue-500 font-mono uppercase tracking-widest border border-blue-500/30 px-2 py-0.5 whitespace-nowrap">
+        <span className="text-[11px] text-gray-400 font-mono uppercase tracking-widest border border-white/30 px-2 py-0.5 whitespace-nowrap">
           {organization.role}
         </span>
       </div>
@@ -28,7 +28,7 @@ function OrganizationCard({ organization }: { readonly organization: Organizatio
           href={organization.link}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex mt-4 text-[10px] font-mono text-blue-500 border border-blue-500/30 px-2 py-0.5 hover:border-blue-400 hover:text-blue-300 transition-all whitespace-nowrap"
+          className="inline-flex mt-4 text-[10px] font-mono text-gray-400 border border-white/30 px-2 py-0.5 hover:border-white hover:text-gray-200 transition-all whitespace-nowrap"
         >
           {organization.link.replace("https://", "")}
         </a>

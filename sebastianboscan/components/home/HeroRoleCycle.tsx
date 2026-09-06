@@ -43,7 +43,7 @@ export function HeroRoleCycle() {
         style={{ opacity: visible ? 1 : 0 }}
       >
         <p className="text-xl text-gray-300">{role.title}</p>
-        <p className="text-xs text-blue-400/70 uppercase tracking-widest mt-1">{role.org}</p>
+        <p className="text-xs text-gray-400 uppercase tracking-widest mt-1">{role.org}</p>
       </div>
     </div>
   );
