@@ -38,18 +38,6 @@ export function TacticalName() {
 
   return (
     <div className="relative">
-      <style>
-        {`
-          @keyframes scan {
-            0% {
-              top: 0;
-            }
-            100% {
-              top: 100%;
-            }
-          }
-        `}
-      </style>
       <h1 className="font-[var(--font-syne)] text-6xl md:text-8xl mb-6 tracking-tight relative">
         {/* Invisible full name reserves layout space so nothing below shifts */}
         <span className="invisible select-none">{fullName}</span>
@@ -63,15 +51,6 @@ export function TacticalName() {
           />
         </span>
       </h1>
-      {/* Scanning line effect */}
-      <div
-        className={`absolute inset-0 bg-gradient-to-b from-transparent via-white/20 to-transparent h-1 ${
-          isComplete ? "opacity-0" : "opacity-100"
-        }`}
-        style={{
-          animation: "scan 2s linear infinite",
-        }}
-      />
     </div>
   );
 }
