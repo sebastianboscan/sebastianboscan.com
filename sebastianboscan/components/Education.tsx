@@ -18,7 +18,7 @@ export default function Education() {
             className="absolute left-0 bottom-0 w-px"
             style={{
               top: "8px",
-              background: "linear-gradient(to bottom, #3b82f6, #1e1e1e 80%, transparent)",
+              background: "linear-gradient(to bottom, #ffffff, #1e1e1e 80%, transparent)",
             }}
           />
           {educationEntries.map((entry) => (

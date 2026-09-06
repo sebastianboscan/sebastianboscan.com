@@ -56,7 +56,7 @@ export function TacticalName() {
         <span className="absolute inset-0">
           {displayText}
           <span
-            className={`inline-block w-1 h-16 md:h-24 bg-blue-500 ml-1 ${
+            className={`inline-block w-1 h-16 md:h-24 bg-white ml-1 ${
               showCursor ? "opacity-100" : "opacity-0"
             } transition-opacity`}
             style={{ verticalAlign: "middle" }}
@@ -65,7 +65,7 @@ export function TacticalName() {
       </h1>
       {/* Scanning line effect */}
       <div
-        className={`absolute inset-0 bg-gradient-to-b from-transparent via-blue-500/20 to-transparent h-1 ${
+        className={`absolute inset-0 bg-gradient-to-b from-transparent via-white/20 to-transparent h-1 ${
           isComplete ? "opacity-0" : "opacity-100"
         }`}
         style={{

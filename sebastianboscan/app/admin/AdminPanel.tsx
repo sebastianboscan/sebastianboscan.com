@@ -18,17 +18,17 @@ const TABS: readonly { key: Tab; label: string }[] = [
 
 const inputClass =
   "w-full bg-black border border-[#1e1e1e] px-3 py-2 text-sm text-[#f0f0f0] " +
-  "focus:border-blue-500/60 focus:outline-none transition-colors placeholder:text-gray-600";
+  "focus:border-white/60 focus:outline-none transition-colors placeholder:text-gray-600";
 
-const labelClass = "block text-[11px] uppercase tracking-[0.2em] text-blue-500 font-mono mb-2";
+const labelClass = "block text-[11px] uppercase tracking-[0.2em] text-gray-400 font-mono mb-2";
 
 const buttonClass =
-  "border border-blue-500/40 text-blue-400 px-5 py-2 text-xs uppercase tracking-[0.2em] " +
-  "font-mono hover:border-blue-400 hover:bg-blue-500/10 transition-all disabled:opacity-40 cursor-pointer";
+  "border border-white/40 text-white px-5 py-2 text-xs uppercase tracking-[0.2em] " +
+  "font-mono hover:border-white hover:bg-white/10 transition-all disabled:opacity-40 cursor-pointer";
 
 const iconButtonClass =
   "border border-[#1e1e1e] text-gray-400 px-2 py-1 text-[11px] font-mono " +
-  "hover:border-blue-500/50 hover:text-blue-300 transition-all disabled:opacity-30 cursor-pointer";
+  "hover:border-white/50 hover:text-gray-200 transition-all disabled:opacity-30 cursor-pointer";
 
 function Field({
   label,
@@ -278,7 +278,7 @@ function FormFields({
             type="checkbox"
             name="inProgress"
             defaultChecked={project?.inProgress}
-            className="accent-blue-500"
+            className="accent-white"
           />
           <span className="text-xs uppercase tracking-widest text-gray-400">In progress</span>
         </label>
@@ -370,7 +370,7 @@ export function AdminPanel({
     <div className="min-h-screen bg-black text-white" style={{ cursor: "crosshair" }}>
       <div className="max-w-2xl mx-auto px-6 py-16">
         <header className="mb-10">
-          <p className="text-[11px] uppercase tracking-[0.2em] text-blue-500 font-mono mb-4 flex items-center gap-3 before:content-[''] before:inline-block before:w-6 before:h-px before:bg-blue-500">
+          <p className="text-[11px] uppercase tracking-[0.2em] text-gray-400 font-mono mb-4 flex items-center gap-3 before:content-[''] before:inline-block before:w-6 before:h-px before:bg-white">
             Local Authoring
           </p>
           <h1 className="font-[var(--font-syne),sans-serif] text-5xl text-[#f0f0f0] tracking-tight">
@@ -378,9 +378,9 @@ export function AdminPanel({
           </h1>
           <p className="text-sm text-gray-400 mt-4 leading-relaxed">
             Edits{" "}
-            <code className="text-blue-400">components/home/content.ts</code> directly. Changes
+            <code className="text-white">components/home/content.ts</code> directly. Changes
             land in your working tree — review the diff and commit them like any other edit. This
-            route only exists in <code className="text-blue-400">npm run dev</code>.
+            route only exists in <code className="text-white">npm run dev</code>.
           </p>
         </header>
 
@@ -392,7 +392,7 @@ export function AdminPanel({
               onClick={() => switchTab(key)}
               className={`px-4 py-2 text-xs uppercase tracking-[0.2em] font-mono transition-colors cursor-pointer border-b-2 -mb-px ${
                 tab === key
-                  ? "text-blue-400 border-blue-500"
+                  ? "text-white border-white"
                   : "text-gray-500 border-transparent hover:text-gray-300"
               }`}
             >

@@ -98,7 +98,7 @@ export default function DisplayApp() {
         {view === "contact" && <ContactView />}
       </DisplayFrame>
 
-      <p className="text-[11px] uppercase tracking-[0.3em] text-gray-500 max-w-[600px] text-center">
+      <p className="text-[11px] uppercase tracking-[0.3em] text-gray-300 max-w-[600px] text-center">
         Preview of the Meta Ray-Ban Display webapp. Use ↑ ↓ ← → and Enter to navigate.
       </p>
     </div>
@@ -108,7 +108,7 @@ export default function DisplayApp() {
 function DisplayFrame({ children }: { readonly children: React.ReactNode }) {
   return (
     <div
-      className="relative bg-black border border-blue-500/30 shadow-[0_0_60px_rgba(59,130,246,0.15)] overflow-hidden"
+      className="relative bg-black border border-white/30 shadow-[0_0_60px_rgba(255,255,255,0.15)] overflow-hidden"
       style={{ width: FRAME_SIZE, height: FRAME_SIZE, cursor: "crosshair" }}
     >
       <FrameCorners />
@@ -118,7 +118,7 @@ function DisplayFrame({ children }: { readonly children: React.ReactNode }) {
 }
 
 function FrameCorners() {
-  const cornerBase = "absolute w-10 h-10 border-blue-500/60 pointer-events-none";
+  const cornerBase = "absolute w-10 h-10 border-white/60 pointer-events-none";
   return (
     <>
       <div className={`${cornerBase} top-0 left-0 border-t-2 border-l-2`} />
@@ -132,17 +132,17 @@ function FrameCorners() {
 function PanelHeader({ label }: { readonly label: string }) {
   return (
     <div className="flex items-center gap-3 px-6 pt-6 pb-3">
-      <div className="w-2 h-2 bg-blue-500 shadow-[0_0_10px_#3b82f6]" />
-      <span className="text-[14px] tracking-[0.35em] text-blue-400 uppercase">{label}</span>
-      <div className="flex-1 h-px bg-gradient-to-r from-blue-500/60 to-transparent" />
+      <div className="w-2 h-2 bg-white shadow-[0_0_10px_#ffffff]" />
+      <span className="text-[14px] tracking-[0.35em] text-white uppercase">{label}</span>
+      <div className="flex-1 h-px bg-gradient-to-r from-white/60 to-transparent" />
     </div>
   );
 }
 
 function PanelFooter({ children }: { readonly children: React.ReactNode }) {
   return (
-    <div className="mt-auto px-6 py-4 border-t border-blue-500/20">
-      <p className="text-[13px] tracking-[0.25em] uppercase text-gray-400">{children}</p>
+    <div className="mt-auto px-6 py-4 border-t border-white/20">
+      <p className="text-[13px] tracking-[0.25em] uppercase text-gray-300">{children}</p>
     </div>
   );
 }
@@ -161,7 +161,7 @@ function MainView({
       <PanelHeader label="HUD // ONLINE" />
       <div className="px-6 pt-2 pb-4">
         <h1 className="text-[28px] leading-tight tracking-wide text-white font-bold">SEBASTIAN BOSCAN</h1>
-        <p className="text-[16px] text-gray-400 tracking-widest uppercase mt-1">CS // USC</p>
+        <p className="text-[16px] text-gray-300 tracking-widest uppercase mt-1">CS // USC</p>
       </div>
       <ul className="flex-1 flex flex-col px-6 gap-2">
         {MENU_ITEMS.map((item, i) => {
@@ -174,13 +174,13 @@ function MainView({
                 onClick={() => onEnter(item.key)}
                 className={`focusable w-full flex items-center gap-4 px-4 text-left border transition-colors ${
                   active
-                    ? "border-blue-500 bg-blue-500/10 text-white shadow-[0_0_18px_rgba(59,130,246,0.35)]"
-                    : "border-blue-500/20 text-gray-400 hover:border-blue-500/50"
+                    ? "border-white bg-white/10 text-white shadow-[0_0_18px_rgba(255,255,255,0.35)]"
+                    : "border-white/20 text-gray-300 hover:border-white/50"
                 }`}
                 style={{ minHeight: 88 }}
               >
                 <span
-                  className={`text-[22px] w-6 inline-block ${active ? "text-blue-400" : "text-blue-500/40"}`}
+                  className={`text-[22px] w-6 inline-block ${active ? "text-white" : "text-white/30"}`}
                 >
                   {active ? "▸" : ""}
                 </span>
@@ -202,12 +202,12 @@ function AboutView() {
       <div className="px-6 py-2 overflow-y-auto flex-1">
         <p className="text-[18px] leading-relaxed text-gray-100">{aboutContent.paragraphs[0]}</p>
         <div className="mt-5">
-          <p className="text-[12px] tracking-[0.3em] text-blue-400 uppercase mb-2">Focus Areas</p>
+          <p className="text-[12px] tracking-[0.3em] text-white uppercase mb-2">Focus Areas</p>
           <div className="flex flex-wrap gap-2">
             {aboutContent.primarySkills.map((skill) => (
               <span
                 key={skill}
-                className="text-[14px] border border-blue-500/40 text-blue-200 px-3 py-1 tracking-wider"
+                className="text-[14px] border border-white/40 text-white px-3 py-1 tracking-wider"
               >
                 {skill}
               </span>
@@ -244,7 +244,7 @@ function ProjectsView({
         <p className="text-[17px] leading-relaxed text-gray-200 flex-1 overflow-y-auto">{project.desc}</p>
         <div className="mt-3 flex flex-wrap gap-2">
           {project.tech.map((t) => (
-            <span key={t} className="text-[12px] border border-blue-500/30 text-blue-300 px-2 py-0.5 tracking-wider">
+            <span key={t} className="text-[12px] border border-white/30 text-gray-200 px-2 py-0.5 tracking-wider">
               {t}
             </span>
           ))}
@@ -253,7 +253,7 @@ function ProjectsView({
           {Array.from({ length: total }).map((_, i) => (
             <span
               key={i}
-              className={`h-1.5 ${i === index ? "w-6 bg-blue-400" : "w-2 bg-blue-500/30"} transition-all`}
+              className={`h-1.5 ${i === index ? "w-6 bg-white" : "w-2 bg-white/30"} transition-all`}
             />
           ))}
         </div>
@@ -277,8 +277,8 @@ function ExperienceView({
       <PanelHeader label={`EXPERIENCE ${String(index + 1).padStart(2, "0")} / ${String(total).padStart(2, "0")}`} />
       <div className="px-6 py-3 flex-1 flex flex-col">
         <h2 className="text-[22px] font-bold text-white leading-tight">{entry.title}</h2>
-        <p className="text-[16px] text-blue-400 mt-1">{entry.org}</p>
-        <p className="text-[12px] tracking-[0.25em] text-gray-500 uppercase mt-0.5">
+        <p className="text-[16px] text-white mt-1">{entry.org}</p>
+        <p className="text-[12px] tracking-[0.25em] text-gray-300 uppercase mt-0.5">
           {entry.date} · {entry.location}
         </p>
         <p className="text-[17px] leading-relaxed text-gray-200 mt-3 flex-1 overflow-y-auto">{entry.desc}</p>
@@ -286,7 +286,7 @@ function ExperienceView({
           {Array.from({ length: total }).map((_, i) => (
             <span
               key={i}
-              className={`h-1.5 ${i === index ? "w-6 bg-blue-400" : "w-2 bg-blue-500/30"} transition-all`}
+              className={`h-1.5 ${i === index ? "w-6 bg-white" : "w-2 bg-white/30"} transition-all`}
             />
           ))}
         </div>
@@ -306,10 +306,10 @@ function ContactView() {
           return (
             <div
               key={link.label}
-              className="border border-blue-500/30 px-4 py-4 bg-blue-500/5"
+              className="border border-white/30 px-4 py-4 bg-white/5"
               style={{ minHeight: 88 }}
             >
-              <p className="text-[12px] tracking-[0.3em] text-blue-400 uppercase">{link.label}</p>
+              <p className="text-[12px] tracking-[0.3em] text-white uppercase">{link.label}</p>
               <p className="text-[20px] text-white mt-1 break-all">{value}</p>
             </div>
           );

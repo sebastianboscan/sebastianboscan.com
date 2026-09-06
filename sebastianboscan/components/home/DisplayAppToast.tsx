@@ -33,22 +33,22 @@ export function DisplayAppToast() {
       role="dialog"
       aria-label="Meta Ray-Ban Display app available"
     >
-      <div className="relative border border-blue-500/40 bg-[#0a0a0a]/95 backdrop-blur-sm p-5 shadow-[0_0_30px_rgba(59,130,246,0.2)]">
-        <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-blue-500/60 pointer-events-none" />
-        <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-blue-500/60 pointer-events-none" />
+      <div className="relative border border-white/40 bg-[#0a0a0a]/95 backdrop-blur-sm p-5 shadow-[0_0_30px_rgba(255,255,255,0.2)]">
+        <div className="absolute top-0 left-0 w-6 h-6 border-t-2 border-l-2 border-white/60 pointer-events-none" />
+        <div className="absolute bottom-0 right-0 w-6 h-6 border-b-2 border-r-2 border-white/60 pointer-events-none" />
 
         <button
           type="button"
           onClick={dismiss}
           aria-label="Dismiss"
-          className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center text-gray-500 hover:text-blue-400 transition-colors text-sm cursor-pointer"
+          className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center text-gray-500 hover:text-white transition-colors text-sm cursor-pointer"
         >
           ✕
         </button>
 
         <div className="flex items-center gap-2 mb-2">
-          <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
-          <span className="text-[10px] text-blue-400 font-mono uppercase tracking-[0.3em]">
+          <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
+          <span className="text-[10px] text-white font-mono uppercase tracking-[0.3em]">
             New // Wearable
           </span>
         </div>
@@ -63,7 +63,7 @@ export function DisplayAppToast() {
 
         <a
           href="/display-app"
-          className="inline-flex items-center gap-2 text-[11px] font-mono uppercase tracking-widest text-blue-300 border border-blue-500/50 px-4 py-2 bg-blue-500/10 hover:bg-blue-500/20 hover:border-blue-400 hover:text-blue-200 transition-all"
+          className="inline-flex items-center gap-2 text-[11px] font-mono uppercase tracking-widest text-gray-200 border border-white/50 px-4 py-2 bg-white/10 hover:bg-white/20 hover:border-white hover:text-white transition-all"
         >
           Open Display App
           <span aria-hidden>→</span>

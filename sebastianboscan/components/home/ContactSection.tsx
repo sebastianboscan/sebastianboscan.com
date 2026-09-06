@@ -18,7 +18,7 @@ export function ContactSection() {
               target={link.href.startsWith("http") ? "_blank" : undefined}
               rel={link.href.startsWith("http") ? "noopener noreferrer" : undefined}
             >
-              <TacticalCard className="p-6 hover:border-blue-500/50 hover:bg-blue-500/5" accent="none">
+              <TacticalCard className="p-6 hover:border-white/50 hover:bg-white/5" accent="none">
                 <p className="text-[10px] text-[#666] font-mono uppercase tracking-widest mb-2">{link.label}</p>
                 <p className="text-[#f0f0f0]">
                   {link.label === "LinkedIn" ? "linkedin.com/in/sebastianboscan" : "sebastian@sc.edu"}

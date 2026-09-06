@@ -11,6 +11,7 @@ npm run dev      # Dev server at localhost:3000
 npm run build    # Production build
 npm run start    # Serve the production build
 npm run lint     # ESLint (flat config, eslint-config-next core-web-vitals + typescript)
+                 # note: the script is bare `eslint` â pass paths to lint a subset
 ```
 
 No test runner is configured — there is no `test` script; do not invent one.
@@ -48,9 +49,27 @@ The shadcn token layer in `globals.css` (`--background`, `--primary`, `.dark`, �
 
 Custom animations `animate-fade-in` / `animate-fade-up` are declared in `globals.css` — reuse them for entrance transitions.
 
+Practically, the palette is spread across ~23 hand-written files as literal Tailwind classes,
+so a palette change means sweeping those literals — there is no single token to flip.
+
+The accent is **monochrome**: `text-white` / `text-gray-200` for bright or active text,
+`text-gray-400` / `text-gray-500` for labels and secondary text, `border-white/20`–`/60` for
+borders, and white glows via `shadow-[0_0_Npx_rgba(255,255,255,a)]`. Brightness alone encodes
+hierarchy now that hue is gone — when adding an active/inactive or primary/secondary pair, make
+the important one *lighter*, and don't introduce a hue for emphasis.
+
+Deliberate exceptions, which are semantic rather than decorative and should stay colored:
+`yellow-*`/`red-*`/`green-*` for status, destructive actions, and success, plus the whole
+`/display-app/casino` easter egg where color is part of the game.
+
+Note: Tailwind arbitrary values cannot contain spaces — write `rgba(255,255,255,0.4)` inside
+`shadow-[...]`, never `rgba(255, 255, 255, 0.4)`, or the class silently fails to compile.
+
 ## Design Theme
 
-Tactical/military HUD aesthetic: black background, `blue-500` accent, drifting grid overlay + radial glow + vignette ([PageBackground.tsx](sebastianboscan/components/home/PageBackground.tsx)), monospace uppercase labels with wide `tracking-[0.25em]`-style letterspacing, corner-bracket borders, and `cursor: crosshair`. New sections and components should follow this visual language.
+Tactical/military HUD aesthetic, pared back to minimalist monochrome: flat black background, white/gray accent, monospace uppercase labels with wide `tracking-[0.25em]`-style letterspacing, and `cursor: crosshair`. New sections and components should follow this visual language.
+
+The homepage hero is deliberately sparse — name, rotating role, and three outline-only links on flat black. The animated grid canvas, the hero corner reticle brackets, the coordinate/clock telemetry readout, and the gradient divider under the name were all removed; don't reintroduce them as "tactical" decoration without asking.
 
 ## Meta Ray-Ban Display App (`/display-app`)
 
@@ -59,7 +78,7 @@ A HUD-style portfolio served to Meta Ray-Ban Display glasses, per
 Hard constraints enforced by the glasses runtime — keep these when editing the route:
 
 - Fixed **600x600** viewport — set via the `viewport` export in [app/display-app/layout.tsx](sebastianboscan/app/display-app/layout.tsx)
-- **Dark background only** (it disappears on the lens); high-contrast light text, body ≥16px
+- **Dark background only** (it disappears on the lens); high-contrast light text, body ≥16px — keep body text at `gray-300` or lighter; mid-grays wash out on the lens
 - Navigation is **arrow keys + Enter only** (Neural Band/captouch gestures map to those keys); no text input, camera, mic, or browser back
 - Interactive elements need a minimum **88px** tap target height (`style={{ minHeight: 88 }}` in the existing views)
 - Must be served over **HTTPS** (Vercel satisfies this)
@@ -67,6 +86,24 @@ Hard constraints enforced by the glasses runtime — keep these when editing the
 Each display route is a single self-contained client component holding a `view` state machine plus a global `keydown` listener; sub-views are local function components in the same file. `/display-app/casino` is an easter-egg game collection following the same pattern.
 
 The homepage shows [DisplayAppToast.tsx](sebastianboscan/components/home/DisplayAppToast.tsx), a dismissible banner gated on the `display-app-toast-dismissed` localStorage key.
+
+## Local-only admin panel (`/admin`)
+
+A development-only authoring tool that **rewrites `components/home/content.ts` on disk**.
+It is not part of the deployed site and is guarded in three places â keep all three when editing:
+
+- [app/admin/page.tsx](sebastianboscan/app/admin/page.tsx) calls `notFound()` unless `NODE_ENV === "development"`
+- Every server action in [actions.ts](sebastianboscan/app/admin/actions.ts) runs `assertDevOnly()` before touching the filesystem
+- The page sets `dynamic = "force-dynamic"` and `robots: { index: false, follow: false }`
+
+[contentFile.ts](sebastianboscan/app/admin/contentFile.ts) does append/update/delete/reorder by
+string-manipulating the source file, mapping each `EntryKind` (`experience` | `project` |
+`organization`) to its const array name. Values are escaped for TS string literals before
+embedding. Because both the homepage and `/display-app` read `content.ts`, writes call
+`revalidatePath` on `/`, `/display-app`, and `/admin`.
+
+If you change the shape of the entry arrays in `home/content.ts`, update the matching
+`*Input` types and serializers in `contentFile.ts` â they are hand-written, not derived.
 
 ## Metadata & Deployment
 
