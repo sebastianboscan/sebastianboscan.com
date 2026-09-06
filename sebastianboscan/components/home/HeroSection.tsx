@@ -13,7 +13,7 @@ export function HeroSection() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {heroLinks.map((link, index) => (
+          {heroLinks.map((link) => (
             <a
               key={link.label}
               href={link.href}
@@ -24,10 +24,7 @@ export function HeroSection() {
               {/* Sweep that scans across the card on hover */}
               <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-out bg-gradient-to-r from-transparent via-white/10 to-transparent pointer-events-none" />
 
-              <div className="relative flex items-center justify-center gap-2">
-                <span className="text-[10px] text-white/50 tabular-nums">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
+              <div className="relative flex items-center justify-center">
                 <span className="text-xs text-gray-300 group-hover:text-white transition-colors uppercase tracking-wider">
                   {link.label}
                 </span>
