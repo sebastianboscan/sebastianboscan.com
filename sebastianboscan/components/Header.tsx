@@ -77,8 +77,8 @@ export default function Header() {
               onClick={handleNavClick}
               className={`text-xs font-mono uppercase tracking-widest px-3 py-2 transition-all border ${
                 activeSection === item.id
-                  ? "text-blue-400 border-blue-500/40 bg-blue-500/10"
-                  : "border-transparent text-gray-400 hover:text-blue-400 hover:bg-blue-500/10 hover:border-blue-500/30"
+                  ? "text-white border-white/40 bg-white/10"
+                  : "border-transparent text-gray-400 hover:text-white hover:bg-white/10 hover:border-white/30"
               }`}
             >
               {item.label}

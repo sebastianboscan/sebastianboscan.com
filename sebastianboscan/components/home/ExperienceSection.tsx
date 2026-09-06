@@ -15,7 +15,7 @@ function ExperienceCard({ entry }: { readonly entry: ExperienceEntry }) {
         <h3 className="text-[#f0f0f0] font-bold">{entry.role}</h3>
         <span className="text-[11px] text-[#666] font-mono uppercase tracking-widest">{entry.date}</span>
       </div>
-      <p className="text-blue-400 text-sm mb-1">{entry.company}</p>
+      <p className="text-white text-sm mb-1">{entry.company}</p>
       <p className="text-[#666] font-mono text-[11px] mb-3">{entry.location}</p>
       <p className="text-gray-500 text-sm">{entry.desc}</p>
     </TacticalCard>
@@ -29,13 +29,13 @@ function TimelineExperienceCard({ entry }: { readonly entry: TimelineExperience 
         <h3 className="text-[#f0f0f0] font-bold">{entry.title}</h3>
         <span className="text-[11px] text-[#666] font-mono uppercase tracking-widest">{entry.date}</span>
       </div>
-      <p className="text-blue-400 text-sm mb-1">{entry.company}</p>
+      <p className="text-white text-sm mb-1">{entry.company}</p>
       <p className="text-[#666] font-mono text-[11px] mb-5">{entry.location}</p>
 
       <div className="relative">
         <div
           className="absolute left-0 w-px"
-          style={{ top: "8px", bottom: "8px", background: "linear-gradient(to bottom, #3b82f6, #1e1e1e)" }}
+          style={{ top: "8px", bottom: "8px", background: "linear-gradient(to bottom, #ffffff, #1e1e1e)" }}
         />
 
         {entry.roles.map((roleEntry, index) => (
@@ -46,12 +46,12 @@ function TimelineExperienceCard({ entry }: { readonly entry: TimelineExperience 
             <div
               className={`absolute left-[-5px] top-[6px] w-[9px] h-[9px] rounded-full ${
                 roleEntry.current
-                  ? "bg-blue-500 shadow-[0_0_10px_#3b82f6]"
-                  : "bg-blue-500/50 shadow-[0_0_8px_rgba(59,130,246,0.4)]"
+                  ? "bg-white shadow-[0_0_10px_#ffffff]"
+                  : "bg-white/50 shadow-[0_0_8px_rgba(255,255,255,0.4)]"
               }`}
             />
             <div className="flex justify-between items-start flex-wrap gap-2 mb-1">
-              <p className={roleEntry.current ? "text-blue-400 text-sm font-medium" : "text-blue-400/60 text-sm font-medium"}>
+              <p className={roleEntry.current ? "text-white text-sm font-medium" : "text-gray-500 text-sm font-medium"}>
                 {roleEntry.role}
               </p>
               <span className="text-[11px] text-[#666] font-mono uppercase tracking-widest">{roleEntry.date}</span>

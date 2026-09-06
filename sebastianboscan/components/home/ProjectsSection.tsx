@@ -7,7 +7,7 @@ function ProjectCard({ project }: { readonly project: ProjectEntry }) {
   return (
     <TacticalCard
       className={`border border-[#1e1e1e] bg-[#111] p-6 transition-all flex flex-col gap-4 ${
-        project.inProgress ? "opacity-50 grayscale cursor-not-allowed" : "hover:border-blue-500/30"
+        project.inProgress ? "opacity-50 grayscale cursor-not-allowed" : "hover:border-white/30"
       }`}
       accent="none"
     >
@@ -23,7 +23,7 @@ function ProjectCard({ project }: { readonly project: ProjectEntry }) {
             href={project.link}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[10px] font-mono text-blue-500 border border-blue-500/30 px-2 py-0.5 hover:border-blue-400 hover:text-blue-300 transition-all whitespace-nowrap"
+            className="text-[10px] font-mono text-gray-400 border border-white/30 px-2 py-0.5 hover:border-white hover:text-gray-200 transition-all whitespace-nowrap"
           >
             {project.link.replace("https://", "")}
           </a>
