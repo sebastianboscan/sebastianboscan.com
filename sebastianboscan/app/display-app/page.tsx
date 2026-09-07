@@ -97,10 +97,6 @@ export default function DisplayApp() {
         )}
         {view === "contact" && <ContactView />}
       </DisplayFrame>
-
-      <p className="text-[11px] uppercase tracking-[0.3em] text-gray-300 max-w-[600px] text-center">
-        Preview of the Meta Ray-Ban Display webapp. Use ↑ ↓ ← → and Enter to navigate.
-      </p>
     </div>
   );
 }
